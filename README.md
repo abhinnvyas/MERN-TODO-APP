@@ -15,4 +15,4 @@ npm run dev #This runs the next.js frontend
 cd api
 npm start #Runs the server.js file with nodemon
 ```
-Then goto http://localhost:3000
+Then goto http://localhost:3000 and ofcourse you need to have **`MongoDb`** installed and running in your system.
