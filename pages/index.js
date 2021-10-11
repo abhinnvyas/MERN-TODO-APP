@@ -1,82 +1,153 @@
-import Head from 'next/head'
+import Head from "next/head";
+import { useEffect, useState } from "react";
+import { PlusIcon, XIcon } from "@heroicons/react/solid";
+
+const API_BASE = "http://localhost:3001";
 
 export default function Home() {
+  const [todos, setTodos] = useState([]);
+  const [isPopupActive, setIsPopupActive] = useState(false);
+  const [newTodo, setNewTodo] = useState("");
+
+  useEffect(() => {
+    getTodos();
+  }, []);
+
+  const getTodos = () => {
+    fetch(API_BASE + "/todos")
+      .then((res) => res.json())
+      .then((data) => setTodos(data))
+      .catch((error) => console.error(error));
+  };
+
+  const setComplete = async (id) => {
+    const data = await fetch(API_BASE + "/todo/complete/" + id, {
+      method: "PUT",
+    }).then((res) => res.json());
+    getTodos();
+  };
+
+  const deleteTodo = async (id) => {
+    const data = await fetch(API_BASE + "/todo/delete/" + id, {
+      method: "DELETE",
+    }).then((res) => res.json());
+    getTodos();
+  };
+
+  const addTodo = async () => {
+    const data = await fetch(API_BASE + "/todo/new", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: newTodo,
+      }),
+    })
+      .then((res) => res.json())
+      .catch((err) => console.error(err));
+
+    getTodos();
+    setIsPopupActive(false);
+    setNewTodo("");
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+    <div className="bg-gray-800">
       <Head>
-        <title>Create Next App</title>
+        <title>Todos</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <main className="">
+        <div className="realtive p-5 outline-none border-0 min-h-screen max-h-auto bg-gray-800 text-white">
+          <div className="">
+            <h1 className="text-3xl font-bold text-center">Welcome, Abhinn</h1>
+            <h1 className="text-gray-300 text-lg font-light p-3 text-left">
+              YOUR TASKS
+            </h1>
+            {todos &&
+              todos.map((todo) => (
+                <div
+                  key={todo._id}
+                  className="flex flex-row items-center gap-x-5 p-4 bg-gray-900 rounded-lg 
+        transition duration-200 mb-3 hover:opacity-95 hover:shadow-md"
+                >
+                  <div
+                    className={`w-[20px] h-[20px] rounded-full bg-gray-700 
+                transition duration-150 cursor-pointer ${
+                  todo.complete && "bg-gradient-to-b from-red-500 to-purple-900"
+                }`}
+                    onClick={() => setComplete(todo._id)}
+                  ></div>
+                  <p
+                    className={`text-md flex-grow text-gray-200 ${
+                      todo.complete && "line-through"
+                    }`}
+                  >
+                    {todo.text}
+                  </p>
+                  <button
+                    onClick={() => deleteTodo(todo._id)}
+                    className="bg-red-600 p-2 rounded-lg 
+                  transition duration-300 ease-out active:scale-90 hover:scale-105"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            <div
+              onClick={() => setIsPopupActive(true)}
+              className="absolute bottom-10 right-10 w-max p-3 bg-gradient-to-br from-red-500 to-purple-900
+            shadow-2xl rounded-full cursor-pointer transition duration-300 ease-out 
+            hover:scale-110 active:scale-90"
+            >
+              <PlusIcon className="w-[30px] h-[30px]" />
+            </div>
 
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js!
-          </a>
-        </h1>
+            {isPopupActive && (
+              <div
+                className="fixed top-[50%] left-[50%] 
+              transform translate-x-[-50%] translate-y-[-50%]
+              w-[100%] max-w-[400px] bg-gray-200 text-black p-9
+              rounded-2xl shadow-2xl"
+              >
+                <button
+                  className="absolute top-[16px] right-[16px]
+                  bg-red-500 p-1 rounded-lg flex justify-center
+                  transition duration-200 ease-in-out
+                  shadow-md hover:shadow-lg"
+                  onClick={() => setIsPopupActive(false)}
+                >
+                  <XIcon className="w-[20px] h-[20px] transition duration-150 text-gray-100 hover:text-white" />
+                </button>
+                <h1 className="text-lg md:text-xl font-semibold uppercase mb-[10px]">
+                  Add Tasks
+                </h1>
 
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="p-3 font-mono text-lg bg-gray-100 rounded-md">
-            pages/index.js
-          </code>
-        </p>
-
-        <div className="flex flex-wrap items-center justify-around max-w-4xl mt-6 sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+                <div className="rounded-xl bg-white p-4 shadow-md">
+                  <input
+                    className="bg-transparent w-[100%] border-none outline-none text-gray-800"
+                    type="text"
+                    placeholder="Add your Task"
+                    value={newTodo}
+                    onChange={(e) => setNewTodo(e.target.value)}
+                  />
+                </div>
+                <button
+                  className="px-10 py-4 rounded-full mt-[16px]
+                  bg-gradient-to-br from-red-500 to-purple-600
+                  text-sm text-center uppercase font-bold text-white
+                  transition duration-250 ease-out shadow-lg hover:shadow-2xl
+                  hover:scale-105 active:scale-90"
+                  onClick={() => (newTodo ? addTodo() : ``)}
+                >
+                  Create Task
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </main>
-
-      <footer className="flex items-center justify-center w-full h-24 border-t">
-        <a
-          className="flex items-center justify-center"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="h-4 ml-2" />
-        </a>
-      </footer>
     </div>
-  )
+  );
 }

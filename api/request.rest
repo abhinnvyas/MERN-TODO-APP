@@ -1,0 +1,18 @@
+GET http://127.0.0.1:3001/todos
+
+###
+
+POST http://127.0.0.1:3001/todo/new HTTP/1.1
+Content-Type: application/json
+
+{
+    "text" : "Fourth Todo"
+}
+
+###
+
+DELETE http://127.0.0.1:3001/todo/delete/615a73af520407afa0516b59 HTTP/1.1
+
+###
+
+PUT http://127.0.0.1:3001/todo/complete/6161eefeeb8e193982f21b0d HTTP/1.1
