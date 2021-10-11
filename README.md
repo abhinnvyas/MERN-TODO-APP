@@ -15,3 +15,4 @@ npm run dev #This runs the next.js frontend
 cd api
 npm start #Runs the server.js file with nodemon
 ```
+Then goto http://localhost:3000
