@@ -1,5 +1,5 @@
 # **MERN TODO APP**
-![MERN TODO APP](./public/screenshot.png)
+![MERN TODO APP](./public/sscreenshot.png)
 
 ## This build uses **`Next.js`** and **`Node.js/Express/MonogDB`**.
 
